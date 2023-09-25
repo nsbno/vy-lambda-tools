@@ -67,20 +67,35 @@ jobs:
 workflows:
   do:
     jobs:
-      - install
+      - install:
+          filters:
+            tags:
+              only: /.*/
 
       - black:
           requires:
             - install
+          filters:
+            tags:
+              only: /.*/
       - mypy:
           requires:
             - install
+          filters:
+            tags:
+              only: /.*/
       - ruff:
           requires:
             - install
+          filters:
+            tags:
+              only: /.*/
       - test:
           requires:
             - install
+          filters:
+            tags:
+              only: /.*/
 
       - publish:
           context:
@@ -94,4 +109,4 @@ workflows:
             branches:
               ignore: /.*/
             tags:
-              only: /^\d+\.\d+\.\d+$/
+              only: /.*/
