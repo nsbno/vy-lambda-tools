@@ -122,7 +122,7 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
             status_code, body = self.handle_error(e)
 
         if dataclasses.is_dataclass(body):
-            body = dataclasses.asdict(body)
+            body = dataclasses.asdict(body)  # type: ignore
 
         return {"statusCode": status_code, "body": json.dumps(body)}
 
