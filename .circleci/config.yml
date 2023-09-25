@@ -55,6 +55,15 @@ jobs:
           name: Ruff
           command: poetry run ruff check .
 
+  publish:
+    executor: python
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Publish
+          command: poetry publish --build
+
 workflows:
   do:
     jobs:
@@ -71,3 +80,15 @@ workflows:
       - test:
           requires:
             - install
+
+      - publish:
+          context:
+            - developer-platform-pypi
+          requires:
+            - black
+            - mypy
+            - ruff
+            - test
+          filters:
+            tags:
+              only: /.*/
