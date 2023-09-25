@@ -1,0 +1,73 @@
+version: 2.1
+
+orbs:
+  python: circleci/python@2.1.1
+
+executors:
+  python:
+    docker:
+      - image: cimg/python:3.11
+
+jobs:
+  install:
+    executor: python
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+      - persist_to_workspace:
+          root: ~/
+          paths:
+              - .
+  test:
+    executor: python
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run: poetry config virtualenvs.in-project true
+      - run:
+          name: Run tests
+          command: poetry run pytest
+
+  black:
+    executor: python
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Black
+          command: poetry run black --check .
+
+  mypy:
+    executor: python
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: MyPy
+          command: poetry run mypy .
+  ruff:
+    executor: python
+    steps:
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Ruff
+          command: poetry run ruff check .
+
+workflows:
+  do:
+    jobs:
+      - install
+      - black:
+          requires:
+            - install
+      - mypy:
+          requires:
+            - install
+      - ruff:
+          requires:
+            - install
+      - test:
+          requires:
+            - install

@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "vy-lambda-tools"
+version = "0.1.0"
+description = ""
+authors = ["Nicolas Harlem Eide <nicolas@harlemeide.net>"]
+readme = "README.adoc"
+packages = [{include = "vy_lambda_tools"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aws-lambda-powertools = "^2.25.1"
+boto3-stubs = {extras = ["dynamodb"], version = "^1.28.53"}
+python-json-logger = "^2.0.7"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.9.1"
+mypy = "^1.5.1"
+pytest = "^7.4.2"
+ruff = "^0.0.291"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
