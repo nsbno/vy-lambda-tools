@@ -11,6 +11,7 @@ python = "^3.11"
 aws-lambda-powertools = "^2.25.1"
 boto3-stubs = {extras = ["dynamodb"], version = "^1.28.53"}
 python-json-logger = "^2.0.7"
+boto3 = "^1.28.53"
 
 
 [tool.poetry.group.dev.dependencies]
