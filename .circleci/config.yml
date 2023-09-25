@@ -68,6 +68,7 @@ workflows:
   do:
     jobs:
       - install
+
       - black:
           requires:
             - install
@@ -90,7 +91,7 @@ workflows:
             - ruff
             - test
           filters:
-            tags:
-              only: /.*/
             branches:
               ignore: /.*/
+            tags:
+              only: /^\d+\.\d+\.\d+$/
