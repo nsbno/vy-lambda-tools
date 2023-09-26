@@ -10,6 +10,9 @@ from aws_lambda_powertools.utilities.data_classes import (
     DynamoDBStreamEvent,
     SQSEvent,
 )
+from aws_lambda_powertools.utilities.data_classes.api_gateway_proxy_event import (
+    APIGatewayEventAuthorizer,
+)
 from aws_lambda_powertools.utilities.data_classes.dynamo_db_stream_event import (
     DynamoDBRecord,
 )
@@ -49,7 +52,8 @@ class LambdaHandler(abc.ABC):
 class HTTPRequest:
     path_parameters: dict[str, Any] = dataclasses.field(default_factory=dict)
     body: dict[str, Any] = dataclasses.field(default_factory=dict)
-    identity: Optional[str] = None
+    account_id: Optional[str] = None
+    jwt: Optional[APIGatewayEventAuthorizer] = None
 
 
 HTTPResponse = tuple[int, Union[Any, dict[str, Any]]]
@@ -97,7 +101,8 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
         return HTTPRequest(
             body=body,
             path_parameters=path_parameters,
-            identity=api_gw_event.request_context.identity.account_id,
+            account_id=api_gw_event.request_context.identity.account_id,
+            jwt=api_gw_event.request_context.authorizer,
         )
 
     def handle_error(self, exception: Exception) -> HTTPResponse:

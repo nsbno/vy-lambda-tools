@@ -98,7 +98,7 @@ class TestApiGatewayHandler:
                 return 200, {
                     "body": request.body,
                     "path_parameters": request.path_parameters,
-                    "caller": request.identity,
+                    "caller": request.account_id,
                 }
 
         handler = _MyApi(instrumentation=instrumentation)
@@ -123,7 +123,7 @@ class TestApiGatewayHandler:
                 return 200, {
                     "body": request.body,
                     "path_parameters": request.path_parameters,
-                    "caller": request.identity,
+                    "caller": request.account_id,
                 }
 
         handler = _MyApi(instrumentation=instrumentation)

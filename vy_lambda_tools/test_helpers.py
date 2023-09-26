@@ -47,6 +47,8 @@ def generate_api_gateway_event(
     body: Optional[Union[dict[str, Any], str]] = None,
     path_parameters: Optional[dict[str, str]] = None,
     caller_account_id: Optional[str] = None,
+    jwt_claims: Optional[dict[str, Any]] = None,
+    jwt_scopes: Optional[list[str]] = None,
     headers: Optional[dict[str, str]] = None,
 ) -> dict[str, Any]:
     headers = headers or {}
@@ -62,7 +64,10 @@ def generate_api_gateway_event(
     return {
         "body": body,
         "pathParameters": path_parameters,
-        "requestContext": {"identity": {"accountId": caller_account_id}},
+        "requestContext": {
+            "identity": {"accountId": caller_account_id},
+            "authorizer": {"claims": jwt_claims, "scopes": jwt_scopes},
+        },
         "headers": headers,
     }
 
