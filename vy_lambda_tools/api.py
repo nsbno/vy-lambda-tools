@@ -69,7 +69,7 @@ def _is_json(decoded_body: str) -> bool:
 
 @dataclass
 class ApiGatewayHandler(LambdaHandler, abc.ABC):
-    allowed_errors: ClassVar[dict[Type[Exception], int]]
+    allowed_errors: ClassVar[dict[Type[Exception], int]] = {}
 
     instrumentation: HandlerInstrumentation
 
