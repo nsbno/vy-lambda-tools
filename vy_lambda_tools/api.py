@@ -67,9 +67,18 @@ def _is_json(decoded_body: str) -> bool:
         return False
 
 
+class JSONEncoderWithSetSupport(json.JSONEncoder):
+    def default(self, o: Any) -> Any:
+        if isinstance(o, set):
+            return list(o)
+
+        return super().default(o)
+
+
 @dataclass
 class ApiGatewayHandler(LambdaHandler, abc.ABC):
     allowed_errors: ClassVar[dict[Type[Exception], int]] = {}
+    json_encoder: ClassVar[type[json.JSONEncoder]] = JSONEncoderWithSetSupport
 
     instrumentation: HandlerInstrumentation
 
@@ -129,7 +138,10 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
         if dataclasses.is_dataclass(body):
             body = dataclasses.asdict(body)  # type: ignore
 
-        return {"statusCode": status_code, "body": json.dumps(body)}
+        return {
+            "statusCode": status_code,
+            "body": json.dumps(body, cls=self.json_encoder),
+        }
 
 
 @dataclass
