@@ -107,11 +107,16 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
         else:
             raise ValueError("Unsupported content type")
 
+        try:
+            jwt = api_gw_event.request_context.authorizer
+        except KeyError:
+            jwt = None
+
         return HTTPRequest(
             body=body,
             path_parameters=path_parameters,
             account_id=api_gw_event.request_context.identity.account_id,
-            jwt=api_gw_event.request_context.authorizer,
+            jwt=jwt,
         )
 
     def handle_error(self, exception: Exception) -> HTTPResponse:

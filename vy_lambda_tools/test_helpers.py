@@ -72,6 +72,32 @@ def generate_api_gateway_event(
     }
 
 
+def generate_api_gateway_event_without_jwt(
+    body: Optional[Union[dict[str, Any], str]] = None,
+    path_parameters: Optional[dict[str, str]] = None,
+    caller_account_id: Optional[str] = None,
+    headers: Optional[dict[str, str]] = None,
+) -> dict[str, Any]:
+    headers = headers or {}
+
+    if body is None:
+        body = ""
+    elif "application/x-www-form-urlencoded" not in headers.get("Content-Type", ""):
+        try:
+            body = json.dumps(body)
+        except json.JSONDecodeError:
+            body = body
+
+    return {
+        "body": body,
+        "pathParameters": path_parameters,
+        "requestContext": {
+            "identity": {"accountId": caller_account_id},
+        },
+        "headers": headers,
+    }
+
+
 def generate_dynamodb_event(old_value: Optional[dict[str, Any]]) -> dict[str, Any]:
     ts = TypeSerializer()
     return {

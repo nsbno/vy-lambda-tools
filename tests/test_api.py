@@ -55,6 +55,27 @@ class TestApiGatewayHandler:
         assert response["statusCode"] == expected_status
         assert json.loads(response["body"]) == expected_response
 
+    def test_should_allow_request_without_jwt(
+        self, instrumentation: HandlerInstrumentation
+    ) -> None:
+        """To test without jwt authorization"""
+        expected_status = 200
+        expected_response = {"hello": "world"}
+
+        handler = _ApiGatewayHandlerTestStub(
+            return_code=expected_status,
+            response=expected_response,
+            instrumentation=instrumentation,
+        )
+
+        response = handler(
+            test_helpers.generate_api_gateway_event_without_jwt(),
+            {},
+        )
+
+        assert response["statusCode"] == expected_status
+        assert json.loads(response["body"]) == expected_response
+
     def test_should_handle_dataclass_responses(
         self, instrumentation: HandlerInstrumentation
     ) -> None:
