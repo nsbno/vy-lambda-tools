@@ -8,12 +8,14 @@ from boto3.dynamodb.types import TypeSerializer
 
 
 def generate_sns_envelope(body: dict[str, Any], _: Any) -> dict[str, Any]:
+    """Generate an envelope for an SNS message to SQS"""
     return {"Message": json.dumps(body)}
 
 
 def generate_eventbridge_envelope(
     body: dict[str, Any], metadata: dict[str, Any]
 ) -> dict[str, Any]:
+    """Generate an envelope for an EventBridge event to SQS"""
     return {
         "version": "0",
         "id": str(uuid.uuid4()),
@@ -22,6 +24,11 @@ def generate_eventbridge_envelope(
         "region": "eu-west-1",
         "detail": body,
     }
+
+
+def generate_no_envelope(body: dict[str, Any], _: Any) -> dict[str, Any]:
+    """No envelope is used for SQS messages that are sent directly to the queue"""
+    return body
 
 
 def generate_sqs_event(

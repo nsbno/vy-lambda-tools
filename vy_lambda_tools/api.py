@@ -187,6 +187,16 @@ class EnvelopeDecoder(abc.ABC):
         pass
 
 
+class NoEnvelope(EnvelopeDecoder):
+    """Envelope decoder used for when passing raw JSON to SQS"""
+
+    def decode(self, event: dict[str, Any]) -> DecodedOutput:
+        return DecodedOutput(
+            body=event,
+            metadata={},
+        )
+
+
 class SNSEnvelope(EnvelopeDecoder):
     """Envelope decoder used for when passing SNS events to SQS"""
 
