@@ -9,9 +9,10 @@ packages = [{include = "vy_lambda_tools"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 aws-lambda-powertools = "^2.25.1"
-boto3-stubs = {extras = ["dynamodb"], version = "^1.28.53"}
+boto3-stubs = {extras = ["dynamodb", "ssm"], version = "^1.28.53"}
 python-json-logger = "^2.0.7"
 boto3 = "^1.28.53"
+moto = "^4.2.13"
 
 
 [tool.poetry.group.dev.dependencies]
