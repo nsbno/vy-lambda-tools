@@ -4,7 +4,7 @@ from typing import Any, MutableMapping, TYPE_CHECKING, Union
 
 from pythonjsonlogger import jsonlogger
 
-from vy_lambda_tools import api
+import vy_lambda_tools.handlers.handler
 
 # https://github.com/python/typeshed/issues/7855
 # Fixed in Python 3.11
@@ -60,7 +60,7 @@ class JsonLogger(_LoggerAdapter):
 
 
 @dataclass
-class HandlerInstrumentation(api.HandlerInstrumentation):
+class HandlerInstrumentation(vy_lambda_tools.handlers.handler.HandlerInstrumentation):
     logger: Union[JsonLogger, logging.Logger]
 
     def handling_api_gateway_error(self, exception: Exception) -> None:

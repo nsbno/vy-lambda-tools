@@ -8,19 +8,20 @@ from unittest.mock import Mock
 import pytest
 from _pytest.fixtures import fixture
 
-from vy_lambda_tools import api, test_helpers
-from vy_lambda_tools.api import (
-    HTTPRequest,
-    HTTPResponse,
-    SNSEnvelope,
+from vy_lambda_tools.handlers import api_gateway
+from vy_lambda_tools.handlers import sqs
+from vy_lambda_tools import test_helpers
+from vy_lambda_tools.handlers.sqs import (
     EnvelopeDecoder,
+    SNSEnvelope,
     EventBridgeEnvelope,
 )
+from vy_lambda_tools.handlers.api_gateway import HTTPRequest, HTTPResponse
 from vy_lambda_tools.instrumentation import HandlerInstrumentation
 
 
 @dataclass
-class _ApiGatewayHandlerTestStub(api.ApiGatewayHandler):
+class _ApiGatewayHandlerTestStub(api_gateway.ApiGatewayHandler):
     return_code: int
     response: Union[dict[str, Any], Any]
 
@@ -114,7 +115,7 @@ class TestApiGatewayHandler:
         caller: Optional[str],
         instrumentation: HandlerInstrumentation,
     ) -> None:
-        class _MyApi(api.ApiGatewayHandler):
+        class _MyApi(api_gateway.ApiGatewayHandler):
             def handler(self, request: HTTPRequest) -> HTTPResponse:
                 return 200, {
                     "body": request.body,
@@ -139,7 +140,7 @@ class TestApiGatewayHandler:
     def test_should_handle_form_urlencoded_requests(
         self, instrumentation: HandlerInstrumentation
     ) -> None:
-        class _MyApi(api.ApiGatewayHandler):
+        class _MyApi(api_gateway.ApiGatewayHandler):
             def handler(self, request: HTTPRequest) -> HTTPResponse:
                 return 200, {
                     "body": request.body,
@@ -191,7 +192,7 @@ class TestApiGatewayHandler:
         expected_message: str,
         instrumentation: HandlerInstrumentation,
     ) -> None:
-        class _MyExceptionalApi(api.ApiGatewayHandler):
+        class _MyExceptionalApi(api_gateway.ApiGatewayHandler):
             allowed_errors = registered_errors
 
             def handler(self, *_: Any, **__: Any) -> Any:
@@ -215,7 +216,7 @@ class TestSQSHandler:
     def test_should_return_nothing_on_success(
         self, instrumentation: HandlerInstrumentation
     ) -> None:
-        class _Handler(api.SQSHandler):
+        class _Handler(sqs.SQSHandler):
             envelope = SNSEnvelope()
 
             def handler(self, body: dict[str, Any], metadata: dict[str, Any]) -> None:
@@ -233,7 +234,7 @@ class TestSQSHandler:
     def test_should_return_batch_item_failures_on_exception(
         self, instrumentation: HandlerInstrumentation
     ) -> None:
-        class _ExceptionalHandler(api.SQSHandler):
+        class _ExceptionalHandler(sqs.SQSHandler):
             envelope = SNSEnvelope()
 
             def handler(self, body: dict[str, Any], metadata: dict[str, Any]) -> None:
@@ -255,7 +256,7 @@ class TestSQSHandler:
     def test_should_error_if_no_envelope_is_present(
         self, instrumentation: HandlerInstrumentation
     ) -> None:
-        class _Handler(api.SQSHandler):
+        class _Handler(sqs.SQSHandler):
             handler = Mock()
 
         with pytest.raises(NotImplementedError):
@@ -279,7 +280,7 @@ class TestSQSHandler:
         metadata: dict[str, Any],
         instrumentation: HandlerInstrumentation,
     ) -> None:
-        class _EnvelopedHandler(api.SQSHandler):
+        class _EnvelopedHandler(sqs.SQSHandler):
             envelope = envelope_handler
             handler = Mock()
 
