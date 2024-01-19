@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   python: circleci/python@2.1.1
+  terraform: circleci/terraform@3.0.0
 
 executors:
   python:
@@ -18,7 +19,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-              - .
+            - .
   test:
     executor: python
     steps:
@@ -64,6 +65,7 @@ jobs:
           name: Publish
           command: poetry publish --build
 
+
 workflows:
   do:
     jobs:
@@ -93,6 +95,18 @@ workflows:
       - test:
           requires:
             - install
+          filters:
+            tags:
+              only: /.*/
+
+      - terraform/validate:
+          checkout: true
+          backend: false
+          matrix:
+            parameters:
+              tag: ["1.6.6"]
+              path: ["./modules/sqs_handler"]
+
           filters:
             tags:
               only: /.*/
