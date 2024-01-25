@@ -207,6 +207,44 @@ class TestApiGatewayHandler:
             "error_type": type(exception).__name__,
         }
 
+    @pytest.mark.parametrize(
+        ("body", "query_parameters"),
+        (
+            pytest.param({}, {}, id="No data"),
+            pytest.param({"my": "portal"}, {"search": "hello-team"}, id="Only Body"),
+            pytest.param({}, {"test": "hello! there"}, id="Only Query Parameters"),
+            pytest.param({"my": "portal"}, {"test": "hello!"}, id="All"),
+        ),
+    )
+    def test_should_handle_query_parameters(
+        self,
+        body: Optional[dict[str, Any]],
+        query_parameters: Optional[dict[str, str]],
+        instrumentation: HandlerInstrumentation,
+    ) -> None:
+        class _MyApi(api_gateway.ApiGatewayHandler):
+            def handler(self, request: HTTPRequest) -> HTTPResponse:
+                return 200, {
+                    "body": request.body,
+                    "query_parameters": request.query_parameters,
+                    "caller": request.account_id,
+                }
+
+        handler = _MyApi(instrumentation=instrumentation)
+        response = handler(
+            test_helpers.generate_api_gateway_event(
+                body=body,
+                query_parameters=query_parameters,
+                caller_account_id="123456789012",
+            ),
+            {},
+        )
+
+        response_body = json.loads(response["body"])
+
+        assert response_body["body"] == body
+        assert response_body["query_parameters"] == query_parameters
+
 
 class TestSQSHandler:
     @fixture
