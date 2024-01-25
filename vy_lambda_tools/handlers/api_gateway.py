@@ -16,6 +16,7 @@ from vy_lambda_tools.handlers.handler import LambdaHandler, HandlerInstrumentati
 @dataclass
 class HTTPRequest:
     path_parameters: dict[str, Any] = dataclasses.field(default_factory=dict)
+    query_parameters: dict[str, Any] = dataclasses.field(default_factory=dict)
     body: dict[str, Any] = dataclasses.field(default_factory=dict)
     account_id: Optional[str] = None
     jwt: Optional[APIGatewayEventAuthorizer] = None
@@ -52,6 +53,15 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
             else {}
         )
 
+        query_parameters = (
+            {
+                key: unquote(value)
+                for key, value in api_gw_event.query_string_parameters.items()
+            }
+            if api_gw_event.query_string_parameters
+            else {}
+        )
+
         if not api_gw_event.body:
             body = {}
         elif (
@@ -72,6 +82,7 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
         return HTTPRequest(
             body=body,
             path_parameters=path_parameters,
+            query_parameters=query_parameters,
             account_id=api_gw_event.request_context.identity.account_id,
             jwt=jwt,
         )
