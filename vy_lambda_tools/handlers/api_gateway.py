@@ -112,6 +112,9 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
             body = dataclasses.asdict(body)  # type: ignore
 
         return {
+            "headers": {
+                "Content-Type": "application/json",
+            },
             "statusCode": status_code,
             "body": json.dumps(body, cls=self.json_encoder),
         }
