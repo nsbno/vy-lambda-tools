@@ -1,6 +1,6 @@
 import abc
 from dataclasses import dataclass
-from typing import ClassVar, Self, Optional
+from typing import ClassVar, Optional
 
 
 class FlagNotFound(Exception):
