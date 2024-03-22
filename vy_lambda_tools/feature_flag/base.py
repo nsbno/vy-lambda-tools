@@ -38,7 +38,7 @@ class FlagProvider(abc.ABC):
         ...
 
 
-class FeatureFlag(abc.ABC):
+class FeatureFlag:
     """A feature flag that can be used to control the behavior of the application"""
 
     key: ClassVar[str]
@@ -53,43 +53,17 @@ class FeatureFlag(abc.ABC):
     def __init__(self, provider: FlagProvider) -> None:
         self.provider = provider
 
-    def __bool__(self):
-        return self.evaluate()
-
-    @abc.abstractmethod
-    def evaluate(self, *args, **kwargs) -> bool:
-        """Evaluate the flag given a condition
-
-        Implementations must always support zero arguments.
-        """
-        ...
-
     def _value(self) -> FlagValue:
         try:
             return self.provider.get_flag(self.key)
         except FlagNotFound:
             return FlagValue(enabled=self.default, context=None)
 
+    def _evaluate(self, *args, for_context: Optional[str] = None, **kwargs) -> bool:
+        """Evaluate the flag given a condition
 
-class ToggleFlag(FeatureFlag):
-    """A simple toggle to turn a feature on or off
-
-    It ignores any context in which it is evaluated
-    """
-
-    def evaluate(self, *args, **kwargs) -> bool:
-        return self._value().enabled
-
-
-class ContextAwareFlag(FeatureFlag):
-    """A flag that is aware of the context in which it is evaluated
-
-    Useful when you want to enable a feature for a specific context, like an account.
-    """
-
-    def evaluate(
-        self: Self, *args, for_context: Optional[str] = None, **kwargs
-    ) -> bool:
+        Implementations must always support zero arguments.
+        """
         value = self._value()
 
         if value.context is None:
@@ -99,3 +73,9 @@ class ContextAwareFlag(FeatureFlag):
             return False
 
         return for_context in value.context
+
+    def __bool__(self):
+        return self._evaluate()
+
+    def for_context(self, context: str) -> bool:
+        return self._evaluate(for_context=context)
