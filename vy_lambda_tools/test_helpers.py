@@ -43,6 +43,7 @@ def generate_sqs_event(
     return {
         "Records": [
             {
+                "eventSource": "aws:sqs",
                 "messageId": md5(json.dumps(body).encode()),
                 "body": json.dumps(envelope(body, metadata)),
             }
@@ -51,6 +52,8 @@ def generate_sqs_event(
 
 
 def generate_api_gateway_event(
+    resource: Optional[str] = None,
+    method: Optional[str] = None,
     body: Optional[Union[dict[str, Any], str]] = None,
     path_parameters: Optional[dict[str, str]] = None,
     query_parameters: Optional[dict[str, str]] = None,
@@ -69,7 +72,9 @@ def generate_api_gateway_event(
         except json.JSONDecodeError:
             body = body
 
-    return {
+    event = {
+        "resource": resource,
+        "httpMethod": method,
         "body": body,
         "pathParameters": path_parameters,
         "queryStringParameters": query_parameters,
@@ -79,6 +84,8 @@ def generate_api_gateway_event(
         },
         "headers": headers,
     }
+
+    return event
 
 
 def generate_api_gateway_event_without_jwt(
@@ -112,6 +119,7 @@ def generate_dynamodb_event(old_value: Optional[dict[str, Any]]) -> dict[str, An
     return {
         "Records": [
             {
+                "eventSource": "aws:dynamodb",
                 "dynamodb": {
                     # We don't care about the sequence number, but it is needed
                     "SequenceNumber": md5(str(datetime.now()).encode()),
@@ -125,7 +133,7 @@ def generate_dynamodb_event(old_value: Optional[dict[str, Any]]) -> dict[str, An
                     }
                     if old_value is not None
                     else {},
-                }
+                },
             }
         ]
     }

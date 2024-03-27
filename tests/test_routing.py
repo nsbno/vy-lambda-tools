@@ -5,12 +5,15 @@ from unittest import mock
 
 import pytest
 
+from vy_lambda_tools import test_helpers
 from vy_lambda_tools.routing import (
     Router,
     NoRoutesError,
     Route,
     RoutingError,
     DuplicateRoutesError,
+    SQSRoute,
+    APIGatewayV1Route,
 )
 
 
@@ -110,3 +113,148 @@ class TestRoutingHandler:
 
         with pytest.raises(DuplicateRoutesError):
             router.add_route(AlwaysDuplicatedRoute(lambda event, context: None))
+
+
+class TestSQSRoutes:
+    @pytest.mark.parametrize(
+        "event, context",
+        [
+            (test_helpers.generate_dynamodb_event({"test": "event"}), {}),
+            (test_helpers.generate_api_gateway_event(), {}),
+        ],
+    )
+    def test_never_match_non_sqs_event(self, event, context):
+        """An SQS route should not match a non-SQS event."""
+        handler = mock.Mock()
+
+        route = SQSRoute(
+            handler, queue_arn="arn:aws:sqs:eu-west-1:123456789012:my-queue"
+        )
+
+        assert not route.matches_route(event, context)
+
+    def test_has_same_route_is_true_for_same_route(self):
+        """The same route should be the same."""
+        handler = mock.Mock()
+
+        queue_arn = "arn:aws:sqs:eu-west-1:123456789012:my-queue"
+
+        route = SQSRoute(handler, queue_arn=queue_arn)
+        same_route = SQSRoute(handler, queue_arn=queue_arn)
+
+        assert route.has_same_route(same_route)
+
+    def test_has_same_route_is_false_for_different_route(self):
+        """Different routes should not be the same."""
+        handler = mock.Mock()
+
+        arn_base = "arn:aws:sqs:eu-west-1:123456789012:"
+
+        route = SQSRoute(handler, queue_arn=f"{arn_base}:queue-a")
+        different_route = SQSRoute(handler, queue_arn=f"{arn_base}:queue-b")
+
+        assert not route.has_same_route(different_route)
+
+
+class TestApiGatewayRoute:
+    def test_has_same_route_is_false_for_different_route(self):
+        """Different routes should not be the same."""
+        handler = mock.Mock()
+
+        route = APIGatewayV1Route(
+            handler,
+            resource="/hello/world",
+        )
+        different_route = APIGatewayV1Route(
+            handler,
+            resource="/goodbye/world",
+        )
+
+        assert not route.has_same_route(different_route)
+
+    def test_has_same_route_is_true_for_same_route(self):
+        """The same route should be the same."""
+        handler = mock.Mock()
+
+        route = APIGatewayV1Route(handler, resource="/hello/world")
+        same_route = APIGatewayV1Route(handler, resource="/hello/world")
+
+        assert route.has_same_route(same_route)
+
+    def test_detects_duplicate_if_one_route_has_method(self):
+        handler = mock.Mock()
+
+        route = APIGatewayV1Route(
+            handler,
+            resource="/hello/world",
+        )
+
+        duplicate_route = APIGatewayV1Route(
+            handler,
+            resource="/hello/world",
+            method="GET",
+        )
+
+        assert route.has_same_route(duplicate_route)
+
+    @pytest.mark.parametrize(
+        ["event", "context"],
+        [
+            (test_helpers.generate_dynamodb_event({"test": "event"}), {}),
+            (test_helpers.generate_sqs_event({"Hello": "World"}), {}),
+        ],
+    )
+    def test_does_not_match_non_api_gateway_event(self, event, context):
+        """An API Gateway route should not match a non-API Gateway event."""
+        handler = mock.Mock()
+
+        route = APIGatewayV1Route(handler, resource="/hello/world")
+
+        assert not route.matches_route(event, context)
+
+    def test_does_match_api_gateway_event(self):
+        """An API Gateway route should match an API Gateway event."""
+        handler = mock.Mock()
+
+        route = APIGatewayV1Route(handler)
+
+        assert route.matches_route(
+            test_helpers.generate_api_gateway_event(), context={}
+        )
+
+    @pytest.mark.parametrize(
+        ["expected_path", "event"],
+        [
+            pytest.param(
+                "/hello/world",
+                test_helpers.generate_api_gateway_event(
+                    resource="/hello/world",
+                ),
+                id="Basic Path",
+            ),
+            pytest.param(
+                "/hello/world",
+                test_helpers.generate_api_gateway_event(
+                    resource="/hello/world",
+                    method="GET",
+                ),
+                id="Basic Path and Method",
+            ),
+            pytest.param(
+                "/hello/{my_param}",
+                test_helpers.generate_api_gateway_event(
+                    resource="/hello/{my_param}",
+                ),
+                id="Path with parameter",
+            ),
+        ],
+    )
+    def test_matches_route_with_path(
+        self, expected_path: str, event: dict[str, Any]
+    ) -> None:
+        """An API Gateway route should match an API Gateway event."""
+        handler = mock.Mock()
+
+        route = APIGatewayV1Route(handler, resource=expected_path)
+
+        assert route.matches_route(event, context={})
