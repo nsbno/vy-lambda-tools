@@ -121,11 +121,17 @@ def generate_dynamodb_event(
     aws_account_id: str = "123456789012",
 ) -> dict[str, Any]:
     ts = TypeSerializer()
+
+    stream_arn = (
+        f"arn:aws:dynamodb:{aws_region}:{aws_account_id}"
+        f":table/{table_name}/stream/2024-12-01T00:00:00.000"
+    )
+
     return {
         "Records": [
             {
                 "eventSource": "aws:dynamodb",
-                "eventSourceARN": f"arn:aws:dynamodb:{aws_region}:{aws_account_id}:table/{table_name}/stream/2024-12-01T00:00:00.000",
+                "eventSourceARN": stream_arn,
                 "dynamodb": {
                     # We don't care about the sequence number, but it is needed
                     "SequenceNumber": md5(str(datetime.now()).encode()),

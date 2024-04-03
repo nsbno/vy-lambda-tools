@@ -31,7 +31,7 @@ class DuplicateRoutesError(Exception):
 class Route(abc.ABC):
     """A route that maps a request to a handler."""
 
-    handler: Callable[[dict[str, Any], dict[str, Any]], ...]
+    handler: Callable[[dict[str, Any], dict[str, Any]], Any]
     """A lambda handler to be called when the route matches the request."""
 
     def __init__(self, handler: Callable[[dict[str, Any], dict[str, Any]], Any]):
@@ -164,10 +164,10 @@ class APIRouteRequest:
 
 
 class APIRouteBase(Route, abc.ABC):
-    resource: str
+    resource: Optional[str]
     """The API Gateway resource that this route matches on."""
 
-    method: str
+    method: Optional[str]
     """The HTTP method that this route matches on."""
 
     def __init__(
@@ -206,6 +206,8 @@ class APIRouteBase(Route, abc.ABC):
                 return True
 
             return self.method == other.method
+
+        return False
 
     def matches_route(self, event: dict[str, Any], context: dict[str, Any]) -> bool:
         if not self._is_event_source(event, context):

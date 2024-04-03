@@ -1,5 +1,4 @@
 """Routing handlers take in a request and sends it to the appropriate handler."""
-from dataclasses import dataclass
 from typing import Any, Callable
 from unittest import mock
 
@@ -46,10 +45,6 @@ class TestRoutingHandler:
         """A router with one route should send the event to the correct handler."""
         router = Router()
 
-        expected_response = {
-            "message": "This was a thriumph! I'm making a note here: huge success."
-        }
-
         class AlwaysMatchingRoute(Route):
             def has_same_route(self, other: "Route") -> bool:
                 return True
@@ -67,7 +62,7 @@ class TestRoutingHandler:
         assert handler.called
 
     def test_router_with_multiple_routes_sends_correct_event_to_handler(self):
-        """A router with multiple routes should send the event to the correct handler."""
+        """A router with multiple routes should send the event to the correct handler"""
         router = Router()
 
         class ConditionalMatchingRoute(Route):
