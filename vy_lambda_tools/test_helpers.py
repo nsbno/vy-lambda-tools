@@ -114,12 +114,18 @@ def generate_api_gateway_event_without_jwt(
     }
 
 
-def generate_dynamodb_event(old_value: Optional[dict[str, Any]]) -> dict[str, Any]:
+def generate_dynamodb_event(
+    old_value: Optional[dict[str, Any]],
+    table_name: str,
+    aws_region: str = "eu-west-1",
+    aws_account_id: str = "123456789012",
+) -> dict[str, Any]:
     ts = TypeSerializer()
     return {
         "Records": [
             {
                 "eventSource": "aws:dynamodb",
+                "eventSourceARN": f"arn:aws:dynamodb:{aws_region}:{aws_account_id}:table/{table_name}/stream/2024-12-01T00:00:00.000",
                 "dynamodb": {
                     # We don't care about the sequence number, but it is needed
                     "SequenceNumber": md5(str(datetime.now()).encode()),

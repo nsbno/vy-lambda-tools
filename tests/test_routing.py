@@ -14,6 +14,7 @@ from vy_lambda_tools.routing import (
     DuplicateRoutesError,
     SQSRoute,
     APIGatewayV1Route,
+    DynamoDBStreamsRoute,
 )
 
 
@@ -119,7 +120,13 @@ class TestSQSRoutes:
     @pytest.mark.parametrize(
         "event, context",
         [
-            (test_helpers.generate_dynamodb_event({"test": "event"}), {}),
+            (
+                test_helpers.generate_dynamodb_event(
+                    {"test": "event"},
+                    "test",
+                ),
+                {},
+            ),
             (test_helpers.generate_api_gateway_event(), {}),
         ],
     )
@@ -200,7 +207,7 @@ class TestApiGatewayRoute:
     @pytest.mark.parametrize(
         ["event", "context"],
         [
-            (test_helpers.generate_dynamodb_event({"test": "event"}), {}),
+            (test_helpers.generate_dynamodb_event({"test": "event"}, "test"), {}),
             (test_helpers.generate_sqs_event({"Hello": "World"}), {}),
         ],
     )
@@ -258,3 +265,64 @@ class TestApiGatewayRoute:
         route = APIGatewayV1Route(handler, resource=expected_path)
 
         assert route.matches_route(event, context={})
+
+
+class TestDynamoDBStreamsRoute:
+    def test_has_same_route_is_true_for_same_route(self):
+        """The same route should be the same."""
+        handler = mock.Mock()
+
+        table_arn = "arn:aws:dynamodb:eu-west-1:123456789012:table/my-table"
+
+        route = DynamoDBStreamsRoute(handler, table_arn=table_arn)
+        same_route = DynamoDBStreamsRoute(handler, table_arn=table_arn)
+
+        assert route.has_same_route(same_route)
+
+    def test_has_same_route_is_false_for_different_route(self):
+        """Different routes should not be the same."""
+        handler = mock.Mock()
+
+        arn_base = "arn:aws:dynamodb:eu-west-1:123456789012:table"
+
+        route = DynamoDBStreamsRoute(handler, table_arn=f"{arn_base}/table-a")
+        different_route = DynamoDBStreamsRoute(handler, table_arn=f"{arn_base}/table-b")
+
+        assert not route.has_same_route(different_route)
+
+    @pytest.mark.parametrize(
+        "event, context",
+        [
+            (test_helpers.generate_sqs_event({"test": "event"}), {}),
+            (test_helpers.generate_api_gateway_event(), {}),
+        ],
+    )
+    def test_never_match_non_dynamodb_event(self, event, context):
+        """A DynamoDB Streams route should not match a non-DynamoDB event."""
+        handler = mock.Mock()
+
+        route = DynamoDBStreamsRoute(
+            handler, table_arn="arn:aws:dynamodb:eu-west-1:123456789012:table/my-table"
+        )
+
+        assert not route.matches_route(event, context)
+
+    def test_matches_dynamodb_event(self):
+        """A DynamoDB Streams route should match a DynamoDB Streams event."""
+        handler = mock.Mock()
+
+        table_name = "my-table"
+        account_id = "123456789012"
+        region = "eu-west-1"
+
+        route = DynamoDBStreamsRoute(
+            handler,
+            table_arn=f"arn:aws:dynamodb:{region}:{account_id}:table/{table_name}",
+        )
+
+        assert route.matches_route(
+            test_helpers.generate_dynamodb_event(
+                {"any": "value"}, table_name, region, account_id
+            ),
+            context={},
+        )

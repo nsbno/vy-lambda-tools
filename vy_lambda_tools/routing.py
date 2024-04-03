@@ -119,6 +119,36 @@ class SQSRoute(EventRouteBase):
         )
 
 
+class DynamoDBStreamsRoute(EventRouteBase):
+    """A route that matches a DynamoDB Streams event."""
+
+    event_source = "aws:dynamodb"
+
+    table_arn: str
+    """The ARN of the table that this route matches on."""
+
+    def __init__(
+        self, handler: Callable[[dict[str, Any], dict[str, Any]], Any], table_arn: str
+    ):
+        super().__init__(handler)
+        self.table_arn = table_arn
+
+    def has_same_route(self, other: "Route") -> bool:
+        return (
+            isinstance(other, DynamoDBStreamsRoute)
+            and self.table_arn == other.table_arn
+        )
+
+    def matches_route(self, event: dict[str, Any], context: dict[str, Any]) -> bool:
+        if not self._is_event_source(event, context):
+            return False
+
+        return any(
+            record["eventSourceARN"].startswith(self.table_arn)
+            for record in event["Records"]
+        )
+
+
 @dataclass
 class APIRouteRequest:
     """A request for an API route.
