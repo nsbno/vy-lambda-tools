@@ -1,0 +1,59 @@
+= Feature Flagging
+
+In this example, you can see how feature flags are used in the library.
+
+
+== How feature flags work
+
+It has two important parts:
+
+=== `FeatureFlag`
+A simple class that holds an enabled flag and a context.
+The context controls if the flag is enabled for spesiﬁc objects or not.
+
+If the context is empty, the ﬂag is enabled for all objects.
+But if the context is not empty,
+the ﬂag is enabled only for the objects that have the same context.
+
+However, if the context is set and the ﬂag is not enabled,
+the ﬂag is disabled for the object.
+
+=== `AWSParameterStoreProvider`
+A class that reads the feature ﬂags from AWS Parameter Store.
+It uses two parameters to control the feature ﬂags:
+
+* `/feature-flags/<flag-name>/enabled`
+* `/feature-flags/<flag-name>/context`
+
+These are by default set to none by the flag module,
+and must be changed by you to enable the feature ﬂags.
+
+The `context` is a list of strings.
+While the `enabled` parameter is a boolean.
+Both must be JSON encoded.
+
+
+== How to change the feature flags
+
+In AWS SSM, find the flags you want to change and set the values to the desired ones.
+
+Here are some examples:
+
+=== Enable a feature flag for all users
+* `/feature-flags/feature1/enabled` = `true`
+* `/feature-flags/feature1/context` = `null`
+
+=== Disable a feature flag for all users
+* `/feature-flags/feature1/enabled` = `false`
+* `/feature-flags/feature1/context` = `null`
+
+=== Enable a feature flag for only two users
+* `/feature-flags/feature1/enabled` = `true`
+* `/feature-flags/feature1/context` = `["wictor", "nicolas"]`
+
+=== Enable flag, but for no users
+* `/feature-flags/feature1/enabled` = `true`
+* `/feature-flags/feature1/context` = `[]`
+
+
+
