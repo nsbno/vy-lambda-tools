@@ -1,10 +1,13 @@
 import json
+import logging
 from dataclasses import dataclass
 from typing import Any
 
 from mypy_boto3_ssm import SSMClient
 
 from vy_lambda_tools.feature_flag.base import FlagProvider, FlagValue, FlagNotFound
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -77,7 +80,12 @@ class AWSParameterStoreProvider(FlagProvider):
         except StopIteration:
             raise FlagNotFound(key)
 
-        enabled = json.loads(enabled_parameter)
+        try:
+            enabled = json.loads(enabled_parameter)
+        except json.JSONDecodeError:
+            logger.exception("Could not load enabled state")
+            enabled = None
+
         if enabled is None:
             raise FlagNotFound(key)
         if enabled not in (True, False):
@@ -91,8 +99,12 @@ class AWSParameterStoreProvider(FlagProvider):
             ),
             None,
         )
+        try:
+            context = json.loads(context_parameter) if context_parameter else None
+        except json.JSONDecodeError:
+            logger.exception("Could not load context")
+            context = None
 
-        context = json.loads(context_parameter) if context_parameter else None
         if context is not None and not isinstance(context, list):
             raise ValueError(f"Invalid value for flag {key}: {context}")
 

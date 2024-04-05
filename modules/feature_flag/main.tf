@@ -34,8 +34,8 @@ data "aws_iam_policy_document" "allow_ssm" {
     ]
 
     resources = [
-      aws_ssm_parameter.context.arn,
-      aws_ssm_parameter.enabled.arn
+      "${local.flag_path}/*",
+      local.flag_path
     ]
   }
 }
