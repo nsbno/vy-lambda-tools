@@ -2,6 +2,8 @@ locals {
   base_name = "/applications/${var.application_name}/flags"
 
   flag_path = "${local.base_name}/${var.flag_name}"
+
+  region = "eu-west-1"
 }
 
 resource "aws_ssm_parameter" "enabled" {
@@ -24,6 +26,8 @@ resource "aws_ssm_parameter" "context" {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 data "aws_iam_policy_document" "allow_ssm" {
   statement {
     actions = [
@@ -34,8 +38,8 @@ data "aws_iam_policy_document" "allow_ssm" {
     ]
 
     resources = [
-      "${local.flag_path}/*",
-      local.flag_path
+      "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter${local.flag_path}/*",
+      "arn:aws:ssm:${local.region}:${data.aws_caller_identity.current.account_id}:parameter${local.flag_path}"
     ]
   }
 }
