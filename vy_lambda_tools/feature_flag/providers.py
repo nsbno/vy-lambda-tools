@@ -58,9 +58,12 @@ class AWSParameterStoreProvider(FlagProvider):
         return f"/{self.prefix}/{self.application_name}/{self.flag_prefix}"
 
     def get_flag(self, key: str) -> FlagValue:
-        response = self.ssm_client.get_parameters_by_path(
-            Path=f"{self._base_path}/{key}", Recursive=False, WithDecryption=False
-        )
+        try:
+            response = self.ssm_client.get_parameters_by_path(
+                Path=f"{self._base_path}/{key}", Recursive=False, WithDecryption=False
+            )
+        except Exception as e:
+            raise FlagNotFound(key) from e
 
         if not response["Parameters"]:
             raise FlagNotFound(key)
