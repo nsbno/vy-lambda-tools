@@ -12,7 +12,7 @@ resource "aws_ssm_parameter" "enabled" {
   value = "null"
 
   lifecycle {
-    ignore_changes = ["value"]
+    ignore_changes = [value]
   }
 }
 
@@ -22,7 +22,7 @@ resource "aws_ssm_parameter" "context" {
   value = "null"
 
   lifecycle {
-    ignore_changes = ["value"]
+    ignore_changes = [value]
   }
 }
 
