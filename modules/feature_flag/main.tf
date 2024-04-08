@@ -45,6 +45,8 @@ data "aws_iam_policy_document" "allow_ssm" {
 }
 
 resource "aws_iam_role_policy" "allow_ssm" {
+  count  = var.lambda_role_name != null ? 1 : 0
+
   role   = var.lambda_role_name
   policy = data.aws_iam_policy_document.allow_ssm.json
 }

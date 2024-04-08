@@ -5,3 +5,7 @@ output "enabled_path" {
 output "context_path" {
   value = aws_ssm_parameter.context.name
 }
+
+output "base_path" {
+  value = local.flag_path
+}

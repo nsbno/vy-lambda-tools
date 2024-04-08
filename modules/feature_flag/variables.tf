@@ -1,14 +1,18 @@
 variable "application_name" {
-  type        = string
   description = "The name of the application"
+
+  type        = string
 }
 
 variable "flag_name" {
-  type        = string
   description = "The name of the flag"
+
+  type        = string
 }
 
 variable "lambda_role_name" {
-  type        = string
   description = "The name of the lambda role that will access the SSM parameters"
+
+  type        = string
+  nullable    = true
 }
