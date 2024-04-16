@@ -14,3 +14,4 @@ class StepFunctionsEventType(TypedDict):
     inputDetails: dict[str, Any]
     output: Optional[str]
     outputDetails: Optional[dict[str, Any]]
+    cause: Optional[str]
