@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "vy-lambda-tools"
-version = "0.4.0"
+version = "0.4.1"
 description = ""
 authors = ["Nicolas Harlem Eide <nicolas@harlemeide.net>"]
 readme = "README.adoc"
