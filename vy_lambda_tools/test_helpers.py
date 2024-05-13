@@ -89,8 +89,11 @@ def generate_api_gateway_event(
 
 
 def generate_api_gateway_event_without_jwt(
+    resource: Optional[str] = None,
+    method: Optional[str] = None,
     body: Optional[Union[dict[str, Any], str]] = None,
     path_parameters: Optional[dict[str, str]] = None,
+    query_parameters: Optional[dict[str, str]] = None,
     caller_account_id: Optional[str] = None,
     headers: Optional[dict[str, str]] = None,
 ) -> dict[str, Any]:
@@ -105,8 +108,11 @@ def generate_api_gateway_event_without_jwt(
             body = body
 
     return {
+        "resource": resource,
+        "httpMethod": method,
         "body": body,
         "pathParameters": path_parameters,
+        "queryStringParameters": query_parameters,
         "requestContext": {
             "identity": {"accountId": caller_account_id},
         },
