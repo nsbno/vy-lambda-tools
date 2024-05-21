@@ -84,7 +84,8 @@ def generate_api_gateway_event(
             "authorizer": {
                 "claims": jwt_claims,
                 "scopes": jwt_scopes,
-                **jwt_context  # authorization context details injected by a Lambda Authorizer
+                # authorization context details injected by a Lambda Authorizer
+                **(jwt_context if jwt_context is not None else {}),
             },
         },
         "headers": headers,

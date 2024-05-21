@@ -69,7 +69,7 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
             == "application/x-www-form-urlencoded"
         ):
             body = parse_qs(api_gw_event.body)
-        elif _is_json(api_gw_event.decoded_body):
+        elif api_gw_event.decoded_body and _is_json(api_gw_event.decoded_body):
             body = api_gw_event.json_body
         else:
             raise ValueError("Unsupported content type")
