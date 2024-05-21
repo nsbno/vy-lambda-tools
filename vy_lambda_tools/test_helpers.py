@@ -60,6 +60,7 @@ def generate_api_gateway_event(
     caller_account_id: Optional[str] = None,
     jwt_claims: Optional[dict[str, Any]] = None,
     jwt_scopes: Optional[list[str]] = None,
+    jwt_context: Optional[dict[str, Any]] = None,
     headers: Optional[dict[str, str]] = None,
 ) -> dict[str, Any]:
     headers = headers or {}
@@ -80,7 +81,11 @@ def generate_api_gateway_event(
         "queryStringParameters": query_parameters,
         "requestContext": {
             "identity": {"accountId": caller_account_id},
-            "authorizer": {"claims": jwt_claims, "scopes": jwt_scopes},
+            "authorizer": {
+                "claims": jwt_claims,
+                "scopes": jwt_scopes,
+                **jwt_context  # authorization context details injected by a Lambda Authorizer
+            },
         },
         "headers": headers,
     }
