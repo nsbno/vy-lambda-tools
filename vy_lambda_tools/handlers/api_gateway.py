@@ -18,6 +18,7 @@ class HTTPRequest:
     path_parameters: dict[str, Any] = dataclasses.field(default_factory=dict)
     query_parameters: dict[str, Any] = dataclasses.field(default_factory=dict)
     body: dict[str, Any] = dataclasses.field(default_factory=dict)
+    raw_body: Optional[str] = None
     account_id: Optional[str] = None
     jwt: Optional[APIGatewayEventAuthorizer] = None
     headers: dict[str, str] = dataclasses.field(default_factory=dict)
@@ -87,6 +88,7 @@ class ApiGatewayHandler(LambdaHandler, abc.ABC):
             account_id=api_gw_event.request_context.identity.account_id,
             jwt=jwt,
             headers=api_gw_event.resolved_headers_field,
+            raw_body=api_gw_event.body,
         )
 
     def handle_error(self, exception: Exception) -> HTTPResponse:
