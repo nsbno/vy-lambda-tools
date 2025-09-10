@@ -100,7 +100,7 @@ version = "1.40.27"
 description = "Type annotations for boto3 1.40.27 generated with mypy-boto3-builder 8.11.0"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "boto3_stubs-1.40.27-py3-none-any.whl", hash = "sha256:7513e6fe7f513fae2af7870a733cd98b6fe02ff9a29b391542b49bda567d719c"},
     {file = "boto3_stubs-1.40.27.tar.gz", hash = "sha256:d0f0b5d7f3ec1000aa23f4edda9604676787a556b1746b2a76e1e832436d6c6c"},
@@ -557,7 +557,7 @@ version = "1.35.12"
 description = "Type annotations and code completion for botocore"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "botocore_stubs-1.35.12-py3-none-any.whl", hash = "sha256:fb1514f0385307f89d189f4247822e4b5c55344b3470364be064fa1ed3c40e9c"},
     {file = "botocore_stubs-1.35.12.tar.gz", hash = "sha256:320520f5b51f60be599b91e781a503f82b277ddc9b18e840254b6e82422e6172"},
@@ -1062,7 +1062,7 @@ version = "1.40.20"
 description = "Type annotations for boto3 DynamoDB 1.40.20 service generated with mypy-boto3-builder 8.11.0"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "mypy_boto3_dynamodb-1.40.20-py3-none-any.whl", hash = "sha256:276f12132b19e5cd9c8c2e551899128acfad39fb56fc77c7e0b005b29d86c844"},
     {file = "mypy_boto3_dynamodb-1.40.20.tar.gz", hash = "sha256:2f424315d299ccf0b3b4e3b2b2300f90f09cd0b7c69fc473d0cdc0b6be6c30d6"},
@@ -1074,7 +1074,7 @@ version = "1.40.0"
 description = "Type annotations for boto3 SSM 1.40.0 service generated with mypy-boto3-builder 8.11.0"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "mypy_boto3_ssm-1.40.0-py3-none-any.whl", hash = "sha256:9f7d03feac4d5eb3e551871d49814994a216539845e5a223ea3f6c17945bcf05"},
     {file = "mypy_boto3_ssm-1.40.0.tar.gz", hash = "sha256:4a656240ead29ffcfb28e95ce7c7ab6c9bbad71bbe7ce81f328ff9b214ff114b"},
@@ -1381,7 +1381,7 @@ version = "0.21.2"
 description = "Type annotations and code completion for awscrt"
 optional = false
 python-versions = "<4.0,>=3.7"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "types_awscrt-0.21.2-py3-none-any.whl", hash = "sha256:0839fe12f0f914d8f7d63ed777c728cb4eccc2d5d79a26e377d12b0604e7bf0e"},
     {file = "types_awscrt-0.21.2.tar.gz", hash = "sha256:84a9f4f422ec525c314fdf54c23a1e73edfbcec968560943ca2d41cfae623b38"},
@@ -1393,7 +1393,7 @@ version = "0.10.2"
 description = "Type annotations and code completion for s3transfer"
 optional = false
 python-versions = ">=3.8"
-groups = ["main"]
+groups = ["dev"]
 files = [
     {file = "types_s3transfer-0.10.2-py3-none-any.whl", hash = "sha256:7a3fec8cd632e2b5efb665a355ef93c2a87fdd5a45b74a949f95a9e628a86356"},
     {file = "types_s3transfer-0.10.2.tar.gz", hash = "sha256:60167a3bfb5c536ec6cdb5818f7f9a28edca9dc3e0b5ff85ae374526fc5e576e"},
@@ -1462,4 +1462,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "7837f23368349c039a6a7b425f30dbf746345bcef6e1696d06e1358674a63746"
+content-hash = "3afdf82f0b7c92ed4dbbaef6fcecdc0d06c613fe5d536a2bbfbecd1ecbc90731"
